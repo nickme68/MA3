@@ -14,8 +14,6 @@ int scopy(char* dst, int pos, const char* src, int n)
 void makeschema(schema& M, config& C, char* name)
 {
 	int k = C.findsec(name);
-	if( k==-1 )
-		k = C.findsec("schema");
 	int n = C.secsize(k); 
 	//cout << "[" << name << "] " << k << " " << n << endl;
 

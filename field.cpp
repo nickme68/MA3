@@ -65,34 +65,22 @@ int randchain(int start, int n, double omega)
 	return l;
 }
 
+// updates field once using random partition of the field (by rows or columns)
 void updatefield(field& F, schema& H, schema& V)
 {
-	if( rand()%2 ) // vertical partition
+	int parH[] = {F.N, F.M, 1, F.M};	// number of chains, length of the chain, delta, delta'
+	int parV[] = {F.M, F.N, F.M, 1};	// ...
+	int r = rand()%2;					// 0 - rows, 1 - columns
+	int* par = r ? parH : parV;			// current parameters
+	schema* S = r ? &H : &V;			// current schema
+	for( int i=0; i<par[0]; i++ )		// loop over all chains
 	{
-		for( int j=0; j<F.M; j++ )
+		int start, end = 0;
+		while( end < par[1] )			// loop over symbols in the current chain
 		{
-			int start = 0;
-			int end = randchain(start, F.N, F.omega);
-			while( end != -1 )
-			{
-				applyrule(V, F.data+start*F.M+j, end-start, F.M);
-				start = end;
-				end = randchain(start, F.N, F.omega);
-			}
-		}
-	}
-	else // horizontal partition
-	{
-		for( int i=0; i<F.N; i++ )
-		{
-			int start = 0;
-			int end = randchain(start, F.M, F.omega);
-			while( end != -1 )
-			{
-				applyrule(H, F.data+i*F.M+start, end-start, 1);
-				start = end;
-				end = randchain(start, F.M, F.omega);
-			}
+			start = end;
+			end = randchain(start, par[1], F.omega); // cut subchain
+			applyrule(*S, F.data+start*par[2]+i*par[3], end-start, par[2]); // replace subchain
 		}
 	}
 }
