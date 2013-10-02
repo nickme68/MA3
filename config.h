@@ -42,4 +42,7 @@ extern double todouble(string);
 extern int toint(string);
 extern double frand();
 
+extern int randbit();
+extern void randbitseed(unsigned int);
+
 #endif

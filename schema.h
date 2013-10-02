@@ -26,6 +26,6 @@ struct schema
 void makeschema(schema& M, config& C, char* name);
 void clearschema(schema& M);
 int findrule(schema& M, char* a, int n, int dk = 1);
-void applyrule(schema& M, char* a, int n, int dk = 1);
+int applyrule(schema& M, char* a, char* p, int dk = 1);
 
 #endif

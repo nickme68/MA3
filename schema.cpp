@@ -124,21 +124,6 @@ int cmp(char* a, int n, int dk, char* b, int m)
 // n - length(a)
 int findrule(schema& M, char* a, int n, int dk)
 {
-	/* serial search
-	for( int i=0; i<M.lnum; i++ )
-	{
-		char* b = M.buf + M.lhs[i];
-		int m = M.lhs[i+1] - M.lhs[i];
-		if( cmp(a,n,dk,b,m)==0 )
-		{
-			//cerr << i;
-			//getchar();
-			return i;
-		}
-	}
-	return -1;
-	//*/
-	//* binary search
 	if( n > M.maxlen )
 		return -1;
 	int l = 0;
@@ -150,30 +135,30 @@ int findrule(schema& M, char* a, int n, int dk)
 		int m = M.lhs[q+1] - M.lhs[q];
 		int c = cmp(a, n, dk, b, m);
 		if( c == 0 )
-		{
-			//cerr << q;
-			//getchar();
 			return q;
-		}
 		if( c < 0 )
 			r = q;
 		else
 			l = q + 1;
 	}
 	return -1;
-	//*/
 }
 
-void applyrule(schema& M, char* a, int n, int dk)
+int applyrule(schema& M, char* a, char* p, int dk)
 {
+	int n = 1;
+	while( p[(n-1)*dk]==0 )
+		n++;
 	int rule = findrule(M, a, n, dk);
-	if( rule == -1 )
-		return;
-	int k = M.pos[rule];
-	double r = frand();
-	while( r > M.prob[k] )
-		k += 1;
-	int j = M.rhs[k];
-	for( int i=0; i<n; i++ )
-		a[i*dk] = M.buf[j+i];
+	if( rule != -1 )
+	{
+		int k = M.pos[rule];
+		double r = frand();
+		while( r > M.prob[k] )
+			k += 1;
+		int j = M.rhs[k];
+		for( int i=0; i<n; i++ )
+			a[i*dk] = M.buf[j+i];
+	}
+	return n;
 }

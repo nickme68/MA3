@@ -19,6 +19,7 @@ void loadfield(field& F, const char* fname)
 		for( int j=0; j<F.M; j++ )
 			F.data[i*F.M+j] = f.get();
 	}
+	F.partition = new char[F.N*F.M];
 	f.close();
 }
 
@@ -43,6 +44,7 @@ void makefield(field& F, config& C)
 void clearfield(field& F)
 {
 	delete[] F.data;
+	delete[] F.partition;
 }
 
 void printfield(field& F, ostream& f)
@@ -55,14 +57,16 @@ void printfield(field& F, ostream& f)
 	}
 }
 
-int randchain(int start, int n, double omega)
+void makepartition(char* partition, int n, int m, double omega, int dir)
 {
-	if( start==n ) 
-		return -1;
-	int l = start+1;
-	while( frand() < omega && l < n) 
-		l += 1;
-	return l;
+	for( int i=0; i<n*m; i++ )
+		partition[i] = (frand()<omega)?0:1;
+	if( dir==1 ) // horizontal
+		for( int i=0; i<n; i++ )
+			partition[(i+1)*m-1] = 1;
+	else // vertical
+		for( int j=0; j<m; j++ )
+			partition[(n-1)*m+j] = 1;
 }
 
 // updates field once using random partition of the field (by rows or columns)
@@ -70,17 +74,17 @@ void updatefield(field& F, schema& H, schema& V)
 {
 	int parH[] = {F.N, F.M, 1, F.M};	// number of chains, length of the chain, delta, delta'
 	int parV[] = {F.M, F.N, F.M, 1};	// ...
-	int r = rand()%2;					// 0 - rows, 1 - columns
+	int r = randbit();					// random choice of the partition type: 1 - rows, 0 - columns
 	int* par = r ? parH : parV;			// current parameters
 	schema* S = r ? &H : &V;			// current schema
+	makepartition(F.partition, F.N, F.M, F.omega, r);
 	for( int i=0; i<par[0]; i++ )		// loop over all chains
 	{
-		int start, end = 0;
-		while( end < par[1] )			// loop over symbols in the current chain
+		int pos = 0;
+		while( pos < par[1] )			// loop over symbols in the current chain
 		{
-			start = end;
-			end = randchain(start, par[1], F.omega); // cut subchain
-			applyrule(*S, F.data+start*par[2]+i*par[3], end-start, par[2]); // replace subchain
+			int start = pos*par[2]+i*par[3]; 
+			pos += applyrule(*S, F.data+start, F.partition+start, par[2]); // replace subchain
 		}
 	}
 }

@@ -12,6 +12,7 @@ struct field
 	int N; // height
 	int M; // width
 	char* data; // field
+	char* partition; // partition matrix
 	double omega;
 	int t;
 	int dt;

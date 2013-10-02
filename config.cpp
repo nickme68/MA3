@@ -184,3 +184,20 @@ double frand()
 	return rand()/(double)RAND_MAX;
 }
 
+unsigned int randbit_x = 1;
+unsigned int randbit_mask = 1<<16; 
+
+void randbitseed(unsigned int x)
+{
+	randbit_x = x;
+}
+
+int randbit()
+{
+	// Linear congruential generator 
+	// Source: http://en.wikipedia.org/wiki/Linear_congruential_generator
+	const unsigned int A = 69069;
+	const unsigned int B = 1; 
+	randbit_x = A*randbit_x + B;
+	return (randbit_x & randbit_mask) ? 1 : 0;
+}
