@@ -104,13 +104,13 @@ void clearschema(schema& M)
 	delete[] M.prob;
 }
 
-int cmp(char* a, int n, int dk, char* b, int m)
+int cmp(char* a, int n, char* b, int m)
 {
 	for( int i=0; i < n && i < m; i++ )
 	{
-		if( a[i*dk] < b[i] )
+		if( a[i] < b[i] )
 			return -1;
-		if( a[i*dk] > b[i] )
+		if( a[i] > b[i] )
 			return 1;
 	}
 	if( n < m )
@@ -122,7 +122,7 @@ int cmp(char* a, int n, int dk, char* b, int m)
 
 // finds rule's number by its left side chain a 
 // n - length(a)
-int findrule(schema& M, char* a, int n, int dk)
+int findrule(schema& M, char* a, int n)
 {
 	if( n > M.maxlen )
 		return -1;
@@ -133,7 +133,7 @@ int findrule(schema& M, char* a, int n, int dk)
 		int q = (l+r)/2;
 		char* b = M.buf + M.lhs[q];
 		int m = M.lhs[q+1] - M.lhs[q];
-		int c = cmp(a, n, dk, b, m);
+		int c = cmp(a, n, b, m);
 		if( c == 0 )
 			return q;
 		if( c < 0 )
@@ -144,12 +144,9 @@ int findrule(schema& M, char* a, int n, int dk)
 	return -1;
 }
 
-int applyrule(schema& M, char* a, char* p, int dk)
+int applyrule(schema& M, char* a, int n)
 {
-	int n = 1;
-	while( p[(n-1)*dk]==0 )
-		n++;
-	int rule = findrule(M, a, n, dk);
+	int rule = findrule(M, a, n);
 	if( rule != -1 )
 	{
 		int k = M.pos[rule];
@@ -158,7 +155,7 @@ int applyrule(schema& M, char* a, char* p, int dk)
 			k += 1;
 		int j = M.rhs[k];
 		for( int i=0; i<n; i++ )
-			a[i*dk] = M.buf[j+i];
+			a[i] = M.buf[j+i];
 	}
 	return n;
 }

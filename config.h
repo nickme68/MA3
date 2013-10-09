@@ -33,6 +33,7 @@ public:
 	string name(int i) { return data[i].name; }
 	string key(int i, int j) { return data[i].records[j].key; }
 	string value(int i, int j, int k) { return data[i].records[j].values[k]; }
+	string safe_value(int i, int j, int k, string a="") { if( i<0 || j<0 ) return a; return value(i, j, k); }
 	int findsec(string sname);
 	int findrec(int s, string rname);
 };

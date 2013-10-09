@@ -13,6 +13,10 @@ struct field
 	int M; // width
 	char* data; // field
 	char* partition; // partition matrix
+	char* data_buf; // buffer for folded chains (data)
+	char* part_buf; // buffer for folded chains (partition)
+	int hcyclic; // cyclic horizontal boundary
+	int vcyclic; // cyclic vertical boundary
 	double omega;
 	int t;
 	int dt;
